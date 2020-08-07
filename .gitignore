@@ -1,0 +1,11 @@
+# exclude binary
+src/mobilewallet
+
+# exclude generated go folder by Vscode
+/go
+
+# exclude others
+.vscode
+vendor
+
+.idea

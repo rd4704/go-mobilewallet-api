@@ -43,6 +43,7 @@ CREATE TABLE transfers (
     description VARCHAR(100) NOT NULL,
     fromWallet int NOT NULL,
     toWallet int NOT NULL,
+    Amount decimal(10,2) NOT NULL,
     createdAt timestamp DEFAULT current_timestamp,
     modifiedAt timestamp DEFAULT current_timestamp,
     FOREIGN KEY (fromWallet) REFERENCES wallets(id),
