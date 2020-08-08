@@ -17,7 +17,7 @@ type User struct {
 
 // GetUser get user by id
 func (u *User) GetUser(db *sql.DB) error {
-	statement := fmt.Sprintf("SELECT u.id, u.name, u.email, w.id as walletId, w.description, w.balance FROM users u INNER JOIN wallets w on w.userId WHERE u.id=%d", u.ID)
+	statement := fmt.Sprintf("SELECT u.id, u.name, u.email, w.id as walletId, w.description, w.balance FROM users u INNER JOIN wallets w on w.userId = u.id WHERE u.id=%d", u.ID)
 	return db.QueryRow(statement).Scan(&u.ID, &u.Name, &u.Email, &u.WalletId, &u.Description, &u.Balance)
 }
 
