@@ -13,6 +13,9 @@ import (
 	// for driver
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
+
+	httpSwagger "github.com/swaggo/http-swagger"
+	_ "mobilewallet/docs"
 )
 
 // App level struct containing its dependencies
@@ -53,7 +56,17 @@ func (amw *authenticationMiddleware) Middleware(next http.Handler) http.Handler 
 	})
 }
 
-// Initialize App dependencies
+// @title MobileWallet API
+// @version 1.0
+// @description This is the API for MobileWallet POC
+// @termsOfService http://swagger.io/terms/
+// @contact.name API Support
+// @contact.email rd4704@gmail.com
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @host localhost:8080
+// @BasePath /
+// @securityDefinitions.apikey ApiKeyAuth
 func (a *App) Initialize() {
 	connectionString := fmt.Sprintf("%s:%s@tcp(db:3306)/%s", dbUsername, dbPassword, dbName)
 
@@ -83,4 +96,5 @@ func (a *App) Run(addr string) {
 func (a *App) initializeRoutes() {
 	user.New(a.AppCtx.DB, a.AppCtx.APIRouter)
 	transfer.New(a.AppCtx.DB, a.AppCtx.APIRouter)
+	a.AppCtx.MainRouter.PathPrefix("/swagger").Handler(httpSwagger.WrapHandler)
 }

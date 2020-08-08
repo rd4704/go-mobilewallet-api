@@ -14,6 +14,17 @@ type Module struct {
 	DB     *sql.DB
 }
 
+// GetUser godoc
+// @Summary Get a transfer information by id
+// @Description Get a transfer information by id
+// @Tags transfer
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} Transfer
+// @Router /api/transfer/{id} [get]
+// @Security ApiKeyAuth
+// @param X-Session-Token header string true "X-Session-Token"
+// @param id path int true "id"
 func (a *Module) getTransfer(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
@@ -36,9 +47,20 @@ func (a *Module) getTransfer(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, t)
 }
 
+// GetUser godoc
+// @Summary Get all transfers history of a user
+// @Description Get all transfers history of a user
+// @Tags transfer
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} Transfer
+// @Router /api/user-transfers/{userId} [get]
+// @Security ApiKeyAuth
+// @param X-Session-Token header string true "X-Session-Token"
+// @param userId path int true "userId"
 func (a *Module) getUserTransfers(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
+	userId, err := strconv.Atoi(vars["userId"])
 	count, _ := strconv.Atoi(r.FormValue("count"))
 	start, _ := strconv.Atoi(r.FormValue("start"))
 
@@ -49,7 +71,7 @@ func (a *Module) getUserTransfers(w http.ResponseWriter, r *http.Request) {
 		start = 0
 	}
 
-	transfers, err := getUserTransfers(a.DB, id, start, count)
+	transfers, err := getUserTransfers(a.DB, userId, start, count)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -58,6 +80,17 @@ func (a *Module) getUserTransfers(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, transfers)
 }
 
+// GetUser godoc
+// @Summary Makes a transfer to a specified walletId
+// @Description Makes a transfer to a specified walletId
+// @Tags transfer
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} Transfer
+// @Router /api/make-transfer [post]
+// @Security ApiKeyAuth
+// @param X-Session-Token header string true "X-Session-Token"
+// @param body body Transfer true "body"
 func (a *Module) makeTransfer(w http.ResponseWriter, r *http.Request) {
 	var t Transfer
 	decoder := json.NewDecoder(r.Body)
@@ -89,7 +122,7 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 
 func (a *Module) initializeRoutes() {
 	a.Router.HandleFunc("/transfer/{id:[0-9]+}", a.getTransfer).Methods("GET")
-	a.Router.HandleFunc("/user-transfers/{id:[0-9]+}", a.getUserTransfers).Methods("GET")
+	a.Router.HandleFunc("/user-transfers/{userId:[0-9]+}", a.getUserTransfers).Methods("GET")
 	a.Router.HandleFunc("/make-transfer", a.makeTransfer).Methods("POST")
 }
 

@@ -15,6 +15,14 @@ type Module struct {
 	DB     *sql.DB
 }
 
+// GetUsers godoc
+// @Summary Get the list of all users and their wallets
+// @Description Get the list of all users and their wallets
+// @Tags user
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} User
+// @Router /api/users [get]
 func (a *Module) getUsers(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Getting users")
 
@@ -37,6 +45,17 @@ func (a *Module) getUsers(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, users)
 }
 
+// GetUser godoc
+// @Summary Get the a user's details and wallets information
+// @Description Get the a user's details and wallets information
+// @Tags user
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} User
+// @Router /api/user/{id} [get]
+// @Security ApiKeyAuth
+// @param X-Session-Token header string true "X-Session-Token"
+// @param id path int true "id"
 func (a *Module) getUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
