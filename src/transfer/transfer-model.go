@@ -13,12 +13,46 @@ type Transfer struct {
 	FromWallet  int     `json:"fromWallet"`
 	ToWallet    int     `json:"toWallet"`
 	Amount      float32 `json:"amount"`
+	CreatedAt   string  `json:"createdAt"`
 }
 
-// GetUser get user by id
+// GetTransfer by id
 func (t *Transfer) GetTransfer(db *sql.DB) error {
-	statement := fmt.Sprintf("SELECT id, description, fromWallet, toWallet, amount from transfers WHERE id=%d", t.ID)
-	return db.QueryRow(statement).Scan(&t.ID, &t.Description, &t.FromWallet, &t.ToWallet, &t.Amount)
+	statement := fmt.Sprintf("SELECT id, description, fromWallet, toWallet, amount, createdAt from transfers WHERE id=%d", t.ID)
+	return db.QueryRow(statement).Scan(&t.ID, &t.Description, &t.FromWallet, &t.ToWallet, &t.Amount, &t.CreatedAt)
+}
+
+// GetTransfers of a user
+func getUserTransfers(db *sql.DB, userId, start, count int) ([]Transfer, error) {
+	statement := fmt.Sprintf(`SELECT t.id as transferId, t.description, t.fromWallet, t.toWallet, CASE
+	WHEN t.fromWallet = w.id THEN t.amount * -1
+	ELSE  t.amount
+	END as amount,
+	t.createdAt
+	from transfers t
+	inner join wallets w on w.id = t.fromWallet or w.id = t.toWallet
+	inner join transfers u on u.id = w.userId
+	WHERE u.id = %d LIMIT %d OFFSET %d`, userId, count, start)
+
+	rows, err := db.Query(statement)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	transfers := []Transfer{}
+
+	for rows.Next() {
+		var t Transfer
+		if err := rows.Scan(&t.ID, &t.Description, &t.FromWallet, &t.ToWallet, &t.Amount, &t.CreatedAt); err != nil {
+			return nil, err
+		}
+		transfers = append(transfers, t)
+	}
+
+	return transfers, nil
 }
 
 /**
