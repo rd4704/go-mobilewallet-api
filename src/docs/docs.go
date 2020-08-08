@@ -217,6 +217,11 @@ var doc = `{
         },
         "/api/users": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Get the list of all users and their wallets",
                 "consumes": [
                     "application/json"
@@ -228,6 +233,15 @@ var doc = `{
                     "user"
                 ],
                 "summary": "Get the list of all users and their wallets",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "X-Session-Token",
+                        "name": "X-Session-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",

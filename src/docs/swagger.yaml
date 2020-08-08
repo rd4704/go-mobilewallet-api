@@ -159,6 +159,12 @@ paths:
       consumes:
       - application/json
       description: Get the list of all users and their wallets
+      parameters:
+      - description: X-Session-Token
+        in: header
+        name: X-Session-Token
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -168,6 +174,8 @@ paths:
             items:
               $ref: '#/definitions/user.User'
             type: array
+      security:
+      - ApiKeyAuth: []
       summary: Get the list of all users and their wallets
       tags:
       - user

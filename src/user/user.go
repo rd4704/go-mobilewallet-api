@@ -22,6 +22,8 @@ type Module struct {
 // @Accept  json
 // @Produce  json
 // @Success 200 {array} User
+// @Security ApiKeyAuth
+// @param X-Session-Token header string true "X-Session-Token"
 // @Router /api/users [get]
 func (a *Module) getUsers(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Getting users")
