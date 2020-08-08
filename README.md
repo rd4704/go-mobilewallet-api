@@ -23,3 +23,10 @@ This will create 3 users and attach 1 wallet to each account.
 A simple token based authentication is used for this PoC, where it's assumed that user will procure the right token using 
 another API and pass this to all the mobile wallet apis.
 Alternatively, the middleware can be extended to use JWT based authentication (which is recommended approach for production).
+There are 3 user tokens hardcoded in the application that can be used in the curl request by providing `X-Session-Token`
+or in swagger as a header param, values are following:
+```
+11111111
+22222222
+33333333
+```
