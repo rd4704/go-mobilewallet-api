@@ -26,6 +26,33 @@ const dbName = "mobilewallet"
 var dbUsername = os.Getenv("DB_USERNAME")
 var dbPassword = os.Getenv("DB_PASSWORD")
 
+// Define our struct
+type authenticationMiddleware struct {
+	tokenUsers map[string]string
+}
+
+// Initialize it somewhere
+func (amw *authenticationMiddleware) Populate() {
+	amw.tokenUsers["11111111"] = "Rahul"
+	amw.tokenUsers["22222222"] = "Mike"
+	amw.tokenUsers["33333333"] = "Pierre"
+}
+
+// Middleware function, which will be called for each request
+func (amw *authenticationMiddleware) Middleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		token := r.Header.Get("X-Session-Token")
+
+		if user, found := amw.tokenUsers[token]; found {
+			// We found the token in our map
+			log.Printf("Authenticated user: %s\n", user)
+			next.ServeHTTP(w, r)
+		} else {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+		}
+	})
+}
+
 // Initialize App dependencies
 func (a *App) Initialize() {
 	connectionString := fmt.Sprintf("%s:%s@tcp(db:3306)/%s", dbUsername, dbPassword, dbName)
@@ -40,6 +67,11 @@ func (a *App) Initialize() {
 
 	a.AppCtx.MainRouter = mux.NewRouter()
 	a.AppCtx.APIRouter = a.AppCtx.MainRouter.PathPrefix("/api").Subrouter()
+
+	amw := authenticationMiddleware{make(map[string]string)}
+	amw.Populate()
+	a.AppCtx.APIRouter.Use(amw.Middleware)
+
 	a.initializeRoutes()
 }
 
